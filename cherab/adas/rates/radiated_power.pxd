@@ -19,7 +19,6 @@
 import numpy as np
 from numpy cimport ndarray
 from cherab.core.math.interpolators.interpolators2d cimport Interpolate2DCubic
-from cherab.openadas.rates.radiated_power cimport *
 from cherab.core.atomic.rates cimport TotalRadiatedPower as CoreTotalRadiatedPower
 
 

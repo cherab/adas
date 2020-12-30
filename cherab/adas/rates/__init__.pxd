@@ -16,10 +16,5 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from cherab.adas.rates.beam cimport *
-from cherab.adas.rates.cx cimport *
-from cherab.adas.rates.pec cimport *
-from cherab.adas.rates.atomic cimport *
-from cherab.adas.rates.radiated_power cimport *
-from cherab.adas.rates.fractional_abundance cimport *
+from cherab.openadas.rates cimport *
 

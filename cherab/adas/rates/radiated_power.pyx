@@ -17,9 +17,6 @@
 # under the Licence.
 
 
-from cherab.openadas.rates.radiated_power import *
-
-
 cdef class TotalRadiatedPower(CoreTotalRadiatedPower):
 
 
