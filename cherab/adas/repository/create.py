@@ -374,5 +374,5 @@ def populate(repository_path=None, adas_home=None):
         (13, 11): 388.12    # from ADAS comment, unknown source
     }
 
-    install_files(rates, repository_path=repository_path, adas_path=adas_path)
+    install_files(rates, repository_path=repository_path, adas_home=adas_home)
     repository.update_wavelengths(wavelengths, repository_path=repository_path)
