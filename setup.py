@@ -9,6 +9,7 @@ import multiprocessing
 threads = multiprocessing.cpu_count()
 force = False
 profile = False
+install_rates = False
 
 if "--force" in sys.argv:
     force = True
@@ -17,6 +18,10 @@ if "--force" in sys.argv:
 if "--profile" in sys.argv:
     profile = True
     del sys.argv[sys.argv.index("--profile")]
+
+if "--install-rates" in sys.argv:
+    install_rates = True
+    del sys.argv[sys.argv.index("--install-rates")]
 
 compilation_includes = [".", numpy.get_include()]
 
@@ -31,19 +36,27 @@ for root, dirs, files in os.walk(setup_path):
             module = path.splitext(pyx_file)[0].replace("/", ".")
             extensions.append(Extension(module, [pyx_file], include_dirs=compilation_includes),)
 
+cython_directives = {
+    'language_level': 3
+}
 if profile:
-    directives = {"profile": True}
-else:
-    directives = {}
+    cython_directives['profile'] = True
 
 
 setup(
     name="cherab-adas",
-    version="1.0.0",
+    version="1.1.0",
     license="EUPL 1.1",
     namespace_packages=['cherab'],
     packages=find_packages(),
     include_package_data=True,
-    ext_modules=cythonize(extensions, nthreads=threads, force=force, compiler_directives=directives)
+    ext_modules=cythonize(extensions, nthreads=threads, force=force, compiler_directives=cython_directives)
 )
 
+# setup a rate repository with common rates
+if install_rates:
+    try:
+        from cherab.adas import repository
+        repository.populate()
+    except ImportError:
+        pass

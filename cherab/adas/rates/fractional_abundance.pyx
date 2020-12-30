@@ -1,5 +1,6 @@
-
-# Copyright 2014-2017 United Kingdom Atomic Energy Authority
+# Copyright 2016-2018 Euratom
+# Copyright 2016-2018 United Kingdom Atomic Energy Authority
+# Copyright 2016-2018 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
 #
 # Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -22,12 +23,6 @@ from cherab.core.atomic.rates cimport FractionalAbundance as CoreFractionalAbund
 
 
 cdef class FractionalAbundance(CoreFractionalAbundance):
-
-    cdef:
-        readonly bint extrapolate
-        readonly tuple density_range, temperature_range
-        readonly ndarray _electron_density, _electron_temperature, _fractional_abundance
-        readonly Interpolate2DCubic _abundance_func
 
     def __init__(self, element, ionisation, electron_density, electron_temperature, fractional_abundance, name='', extrapolate=False):
 

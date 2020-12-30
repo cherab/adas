@@ -16,4 +16,18 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-__import__('pkg_resources').declare_namespace(__name__)
+import numpy as np
+from numpy cimport ndarray
+from cherab.core.math.interpolators.interpolators2d cimport Interpolate2DCubic
+from cherab.openadas.rates.radiated_power cimport *
+from cherab.core.atomic.rates cimport TotalRadiatedPower as CoreTotalRadiatedPower
+
+
+cdef class TotalRadiatedPower(CoreTotalRadiatedPower):
+
+    cdef:
+        readonly bint extrapolate
+        readonly tuple density_range, temperature_range
+        readonly ndarray _electron_density, _electron_temperature, _radiated_power
+        readonly Interpolate2DCubic _power_func
+

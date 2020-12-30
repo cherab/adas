@@ -1,5 +1,6 @@
-
-# Copyright 2014-2017 United Kingdom Atomic Energy Authority
+# Copyright 2016-2018 Euratom
+# Copyright 2016-2018 United Kingdom Atomic Energy Authority
+# Copyright 2016-2018 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
 #
 # Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -15,9 +16,8 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from .beam import *
-from .cx import *
-from .pec import *
-from .atomic import *
-from .radiated_power import *
-from .fractional_abundance import *
+from cherab.openadas.parse.adf11 import parse_adf11
+from cherab.openadas.parse.adf12 import parse_adf12
+from cherab.openadas.parse.adf15 import parse_adf15
+from cherab.openadas.parse.adf21 import parse_adf21
+from cherab.openadas.parse.adf22 import parse_adf22bmp, parse_adf22bme

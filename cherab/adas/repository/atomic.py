@@ -1,5 +1,6 @@
-
-# Copyright 2014-2017 United Kingdom Atomic Energy Authority
+# Copyright 2016-2018 Euratom
+# Copyright 2016-2018 United Kingdom Atomic Energy Authority
+# Copyright 2016-2018 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
 #
 # Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -15,9 +16,10 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from .beam import *
-from .cx import *
-from .pec import *
-from .atomic import *
-from .radiated_power import *
-from .fractional_abundance import *
+
+import cherab.openadas.repository.atomic as atomic
+from cherab.openadas.repository.atomic import *
+from .utility import DEFAULT_REPOSITORY_PATH
+
+
+atomic.DEFAULT_REPOSITORY_PATH = DEFAULT_REPOSITORY_PATH

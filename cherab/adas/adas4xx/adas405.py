@@ -1,5 +1,6 @@
-
-# Copyright 2014-2017 United Kingdom Atomic Energy Authority
+# Copyright 2016-2018 Euratom
+# Copyright 2016-2018 United Kingdom Atomic Energy Authority
+# Copyright 2016-2018 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
 #
 # Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -16,7 +17,7 @@
 # under the Licence.
 
 import numpy as np
-from adas4xx import run_adas405 as _run_adas405
+from adas import run_adas405 as _run_adas405
 
 
 _cached_adas405_calls = {}
