@@ -325,7 +325,7 @@ class ADAS(AtomicData):
 
         electron_densities, electron_temperatures, _, total_power_array, _, _, _, _ = run_adas405(elem=ion.symbol.lower())
 
-        return TotalRadiatedPower(ion, radiation_type, electron_densities, electron_temperatures, total_power_array,
+        return TotalRadiatedPower(ion, electron_densities, electron_temperatures, total_power_array,
                                   extrapolate=self._permit_extrapolation)
 
     def fractional_abundance(self, ion, ionisation):
