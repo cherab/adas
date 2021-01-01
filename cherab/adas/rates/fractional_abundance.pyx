@@ -28,10 +28,6 @@ cdef class FractionalAbundance(CoreFractionalAbundance):
 
         super().__init__(element, ionisation, name)
 
-        self.name = name
-        self.element = element
-        self.ionisation = ionisation
-
         self._electron_density = np.array(electron_density)
         self._electron_temperature = np.array(electron_temperature)
         self._fractional_abundance = np.array(fractional_abundance)
