@@ -16,7 +16,6 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-import numpy as np
 from numpy cimport ndarray
 from cherab.core.math.interpolators.interpolators2d cimport Interpolate2DCubic
 from cherab.core.atomic.rates cimport TotalRadiatedPower as CoreTotalRadiatedPower
