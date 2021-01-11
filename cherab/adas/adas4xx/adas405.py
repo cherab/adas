@@ -41,17 +41,17 @@ def run_adas405(uid='adas', year=96, elem='ne'):
                 ne_list.append(ne * 1E-6)
                 te_list.append(te)
 
-        fraction, power = _run_adas405(uid='adas', year=96, elem='ne', te=te_list, dens=ne_list)
+        fraction, power = _run_adas405(uid=uid, year=year, elem=elem, te=te_list, dens=ne_list)
 
         fractional_array = fraction['ion']
         number_species = fractional_array.shape[-1]
         fractional_array = fractional_array.reshape((len(_electron_densities), len(_electron_temperatures), number_species))
 
-        total_power_array = power['total'].reshape((len(_electron_densities), len(_electron_temperatures)))
-        plt_array = power['plt'].reshape((len(_electron_densities), len(_electron_temperatures)))
-        prb_array = power['prb'].reshape((len(_electron_densities), len(_electron_temperatures)))
-        prc_array = power['prc'].reshape((len(_electron_densities), len(_electron_temperatures)))
-        stage_resolved_line_radiation = power['ion'].reshape((len(_electron_densities), len(_electron_temperatures), number_species))
+        total_power_array = power['total'].reshape((len(_electron_densities), len(_electron_temperatures))) * 1E6
+        plt_array = power['plt'].reshape((len(_electron_densities), len(_electron_temperatures))) * 1E6
+        prb_array = power['prb'].reshape((len(_electron_densities), len(_electron_temperatures))) * 1E6
+        prc_array = power['prc'].reshape((len(_electron_densities), len(_electron_temperatures))) * 1E6
+        stage_resolved_line_radiation = power['ion'].reshape((len(_electron_densities), len(_electron_temperatures), number_species)) * 1E6
 
         _cached_adas405_calls[unique_cache_id] = (fractional_array, total_power_array, plt_array, prb_array, prc_array, stage_resolved_line_radiation)
 
