@@ -1,28 +1,50 @@
 
+import numpy as np
 import matplotlib.pyplot as plt
-plt.ion()
 
 from cherab.core.atomic import neon
+from cherab.core.math import sample2d_grid
 from cherab.adas import ADAS
 
 
-print("testing total radiation for Neon")
+print("Testing total radiation for Neon.")
 
 atomic_data = ADAS()
 
+electron_density = np.array([1.e19])
+electron_temperature = np.logspace(0, 4, 41)
+
+# Obtaining total radiation using ADAS405 code (equilibrium balance)
+total_rad = atomic_data.total_radiated_power(neon)
+total_power = sample2d_grid(total_rad, electron_density, electron_temperature).squeeze()
+
+# Obtaining fractional abundance using ADAS405 code
+fractional_abundance = np.zeros((11, electron_temperature.size))
+for charge in range(11):
+    fraction = atomic_data.fractional_abundance(neon, charge)
+    fractional_abundance[charge] = sample2d_grid(fraction, electron_density, electron_temperature).squeeze()
+
+# Obtaining line and continuum radiation
+line_power = np.zeros((10, electron_temperature.size))
+continuum_power = np.zeros((10, electron_temperature.size))
+for charge in range(10):
+    line_rad = atomic_data.line_radiated_power_rate(neon, charge)
+    continuum_rad = atomic_data.continuum_radiated_power_rate(neon, charge + 1)
+    line_power[charge] = sample2d_grid(line_rad, electron_density, electron_temperature).squeeze() * fractional_abundance[charge]
+    continuum_power[charge] = sample2d_grid(continuum_rad, electron_density, electron_temperature).squeeze() * fractional_abundance[charge + 1]
+
 plt.figure()
-
-ne_total_rad = atomic_data.radiated_power_rate(neon, 'total')
-ne_total_rad.plot_temperature()
-
-ne_line_rad = atomic_data.radiated_power_rate(neon, 'line')
-ne_line_rad.plot_temperature()
-
-ne_continuum_rad = atomic_data.radiated_power_rate(neon, 'continuum')
-ne_continuum_rad.plot_temperature()
-
+plt.plot(electron_temperature, total_power, '-k', label='Total radiation')
+plt.plot(electron_temperature, continuum_power.sum(0), ls=':', color='k', label='Recombination + Bremsstr.')
+plt.plot(electron_temperature, line_power.sum(0), ls=':', color='0.7', label='Total line radiation')
+for charge in range(line_power.shape[0]):
+    plt.plot(electron_temperature, line_power[charge], ls='--', label='Ne(+{}) line radiation'.format(charge))
+plt.xscale('log')
+plt.yscale('log')
+plt.ylim(1.e-39, 1.e-31)
 plt.xlabel("Electron Temperature (eV)")
-plt.ylabel("Total emission (W/m^3)")
+plt.ylabel("Power function (W m^3)")
 plt.title("Neon radiation")
-plt.legend(loc=3)
+plt.legend(ncol=2, fontsize=9)
+plt.show()
 

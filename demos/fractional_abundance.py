@@ -1,6 +1,5 @@
 
 import matplotlib.pyplot as plt
-plt.ion()
 
 from cherab.core.atomic import neon
 from cherab.adas import ADAS
@@ -37,3 +36,5 @@ plt.legend()
 plt.title("Fractional abundance of Neon in coronal equilibrium")
 plt.xlabel("Electron Temperature (eV)")
 plt.ylabel("Fractional Abundance (%)")
+plt.show()
+
