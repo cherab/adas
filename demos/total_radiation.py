@@ -47,4 +47,3 @@ plt.ylabel("Power function (W m^3)")
 plt.title("Neon radiation")
 plt.legend(ncol=2, fontsize=9)
 plt.show()
-

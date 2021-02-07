@@ -37,4 +37,3 @@ plt.title("Fractional abundance of Neon in coronal equilibrium")
 plt.xlabel("Electron Temperature (eV)")
 plt.ylabel("Fractional Abundance (%)")
 plt.show()
-

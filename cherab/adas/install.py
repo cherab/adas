@@ -320,18 +320,13 @@ def _locate_adas_file(file_path, adas_home=None):
     if not adas_home:
         # trying to find adas home directory
 
-        search_paths = []
         try:
-            search_paths.append(os.environ["ADASHOME"])
+            adas_home = os.environ["ADASHOME"]
         except KeyError:
-            search_paths.append("/home/adas")
+            adas_home = "/home/adas"
 
-        for spath in search_paths:
-            if os.path.isdir(spath):
-                adas_home = spath
-                break
-        else:
-            raise IOError("Could not find the ADAS data directory.")
+        if not os.path.isdir(adas_home):
+            raise IOError("Could not find the ADAS root directory.")
 
     # is file in adas path?
     target = os.path.join(adas_home, file_path)

@@ -16,10 +16,13 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
+from cherab.core.math.interpolators import Interpolate1DLinear
 from cherab.core import AtomicData
 from cherab.core.atomic.elements import Isotope
+from cherab.core.atomic import ZeemanStructure
 from cherab.adas.repository import DEFAULT_REPOSITORY_PATH
 from cherab.adas.adas4xx.adas405 import run_adas405
+from cherab.adas.adas6xx.adas603 import run_adas603
 
 from cherab.adas.rates import *
 from cherab.adas import repository
@@ -338,3 +341,36 @@ class ADAS(AtomicData):
         name = ion.symbol + '_' + str(ionisation)
 
         return FractionalAbundance(ion, ionisation, electron_densities, electron_temperatures, fraction[:, :, ionisation], name=name)
+
+    def zeeman_structure(self, line, b_field=None):
+        r"""
+        Provides wavelengths and ratios of
+        :math:`\pi`-/:math:`\sigma`-polarised Zeeman components of the specified spectral line
+        for any given value of magnetic field strength.
+
+        :param Line line: Spectral line object.
+                          Run cherab.adas.adas6xx.print_adas603_supported_lines() to see
+                          the complete list of supported lines.
+        :param b_field: The grid of magnetic field strength (list or ndarray)
+                        to interpolate from. Defaults to np.arange(0, bmax, 0.1),
+                        where bmax is B_FIELD_MAX[line] if B_FIELD_MAX is
+                        specified for this line, or 20.0 T if B_FIELD_MAX is not specified.
+        :return:
+        """
+
+        b_field, wls_pi, comp_pi, wls_sigma, comp_sigma = run_adas603(line, b_field)
+
+        wavelengths_pi = []
+        ratios_pi = []
+        wavelengths_sigma = []
+        ratios_sigma = []
+
+        for i in range(wls_pi.shape[1]):
+            wavelengths_pi.append(Interpolate1DLinear(b_field, wls_pi[:, i]))
+            ratios_pi.append(Interpolate1DLinear(b_field, comp_pi[:, i]))
+
+        for i in range(wls_sigma.shape[1]):
+            wavelengths_sigma.append(Interpolate1DLinear(b_field, wls_sigma[:, i]))
+            ratios_sigma.append(Interpolate1DLinear(b_field, comp_sigma[:, i]))
+
+        return ZeemanStructure(wavelengths_pi, ratios_pi, wavelengths_sigma, ratios_sigma)
