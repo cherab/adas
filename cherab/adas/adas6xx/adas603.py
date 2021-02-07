@@ -184,17 +184,17 @@ def run_adas603(line, b_field=None, adas_fort=None):
 
     if line in MULTIPLETS:
         executable = 'components603'
-        comm_str_suffix = '{}\n'.format(MULTIPLETS.index(line))
+        comm_str_suffix = '{}'.format(MULTIPLETS.index(line))
     elif line in HDLIKE:
         executable = 'hdlikecomponents603'
-        comm_str_suffix = '{}\n{}\n{}\n'.format(line.transition[1], line.transition[0], ION_INDEX[line.element])
+        comm_str_suffix = '{}\n{}\n{}'.format(line.transition[1], line.transition[0], ION_INDEX[line.element])
     else:
         print_adas603_supported_lines()
         raise ValueError('{} is not supported.'.format(line))
 
     if adas_fort is None:
         try:
-            adas_fort = os.environ('ADASFORT')
+            adas_fort = os.environ['ADASFORT']
         except KeyError:
             if '64' in platform.architecture()[0].lower():
                 adas_fort = 'home/adas/bin64'
@@ -215,7 +215,8 @@ def run_adas603(line, b_field=None, adas_fort=None):
         process = Popen([file_path], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         # the components are calculated for 90 deg angle between the magnetic field vector and the observation direction,
         # at this angle, the ratio between pi- and sigma-polarised components is 1/1.
-        outs, errors = process.communicate(b'{}\n{}\n{}\n{}\n'.format(1, 90., b, comm_str_suffix))
+        comm_str = '{}\n{}\n{}\n{}\n'.format(1, 90., b, comm_str_suffix)
+        outs, errors = process.communicate(bytes(comm_str, 'utf-8'))
 
         if errors:
             raise IOError('Process {} is terminated with error: {}.'.format(file_path, errors.decode('utf-8')))
