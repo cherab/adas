@@ -136,14 +136,14 @@ def print_adas603_supported_lines():
     print()
     print("The following multiplet lines are supported:")
     for i, line in enumerate(MULTIPLETS):
-        print('{}:, {}, {} nm'.format(i + 1, line))
+        print('{}: {}'.format(i + 1, line))
     print()
     print("The following hydrogen and hydrogen-like lines are supported:")
     for i, line in enumerate(HDLIKE):
         if not B_FIELD_MAX[line]:
-            print('{}:, {}'.format(i + 1, line))
+            print('{}: {}'.format(i + 1, line))
         else:
-            print('{}:, {}, B_FIELD_MAX = {} T'.format(i + 1, line, B_FIELD_MAX[line]))
+            print('{}: {}, B_FIELD_MAX = {} T'.format(i + 1, line, B_FIELD_MAX[line]))
 
 
 def run_adas603(line, b_field=None, adas_fort=None):
@@ -172,16 +172,6 @@ def run_adas603(line, b_field=None, adas_fort=None):
              :math:`\pi`-/:math:`\sigma`-polarised components.
     """
 
-    if not b_field:
-        bmax = B_FIELD_MAX[line] or 20.
-        b_field = np.arange(0, bmax, 0.1)
-    else:
-        b_field = np.sort(b_field)
-        if b_field[0] < 0:
-            raise ValueError("Argument b_field must contain non-negative values.")
-        if B_FIELD_MAX[line] is not None and b_field[-1] > B_FIELD_MAX[line]:
-            raise ValueError("Maximum b_field value for {} is {} T.".format(line, B_FIELD_MAX[line]))
-
     if line in MULTIPLETS:
         executable = 'components603'
         comm_str_suffix = '{}'.format(MULTIPLETS.index(line))
@@ -191,6 +181,16 @@ def run_adas603(line, b_field=None, adas_fort=None):
     else:
         print_adas603_supported_lines()
         raise ValueError('{} is not supported.'.format(line))
+
+    if not b_field:
+        bmax = B_FIELD_MAX[line] or 20.
+        b_field = np.arange(0, bmax, 0.1)
+    else:
+        b_field = np.sort(b_field)
+        if b_field[0] < 0:
+            raise ValueError("Argument b_field must contain non-negative values.")
+        if B_FIELD_MAX[line] is not None and b_field[-1] > B_FIELD_MAX[line]:
+            raise ValueError("Maximum b_field value for {} is {} T.".format(line, B_FIELD_MAX[line]))
 
     if adas_fort is None:
         try:
