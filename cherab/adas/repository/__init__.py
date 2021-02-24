@@ -16,4 +16,10 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-__import__('pkg_resources').declare_namespace(__name__)
+from .beam import *
+from .pec import *
+from .atomic import *
+from .wavelength import *
+from .radiated_power import *
+from .utility import DEFAULT_REPOSITORY_PATH
+from .create import populate

@@ -16,4 +16,7 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-__import__('pkg_resources').declare_namespace(__name__)
+from .cx import *
+from .stopping import *
+from .population import *
+from .emission import *

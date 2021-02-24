@@ -16,4 +16,16 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-__import__('pkg_resources').declare_namespace(__name__)
+from numpy cimport ndarray
+from cherab.core.math.interpolators.interpolators2d cimport Interpolate2DCubic
+from cherab.core.atomic.rates cimport FractionalAbundance as CoreFractionalAbundance
+
+
+cdef class FractionalAbundance(CoreFractionalAbundance):
+
+    cdef:
+        readonly bint extrapolate
+        readonly tuple density_range, temperature_range
+        readonly ndarray _electron_density, _electron_temperature, _fractional_abundance
+        readonly Interpolate2DCubic _abundance_func
+

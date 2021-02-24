@@ -16,4 +16,5 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-__import__('pkg_resources').declare_namespace(__name__)
+from cherab.openadas.rates cimport *
+

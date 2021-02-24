@@ -16,4 +16,10 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-__import__('pkg_resources').declare_namespace(__name__)
+import cherab.openadas.repository.beam.stopping as _beam_stopping
+from ..utility import repository_path_decorator
+
+
+add_beam_stopping_rate = repository_path_decorator(_beam_stopping.add_beam_stopping_rate)
+update_beam_stopping_rates = repository_path_decorator(_beam_stopping.update_beam_stopping_rates)
+get_beam_stopping_rate = repository_path_decorator(_beam_stopping.get_beam_stopping_rate)

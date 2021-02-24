@@ -15,5 +15,6 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from .fractional_abundance import *
+from cherab.openadas.rates import *
 from .radiated_power import *
+from .fractional_abundance import *

@@ -16,4 +16,17 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-__import__('pkg_resources').declare_namespace(__name__)
+import cherab.openadas.repository.pec as _pec
+from .utility import repository_path_decorator
+
+
+add_pec_excitation_rate = repository_path_decorator(_pec.add_pec_excitation_rate)
+get_pec_excitation_rate = repository_path_decorator(_pec.get_pec_excitation_rate)
+
+add_pec_recombination_rate = repository_path_decorator(_pec.add_pec_recombination_rate)
+get_pec_recombination_rate = repository_path_decorator(_pec.get_pec_recombination_rate)
+
+add_pec_thermalcx_rate = repository_path_decorator(_pec.add_pec_thermalcx_rate)
+get_pec_thermalcx_rate = repository_path_decorator(_pec.get_pec_thermalcx_rate)
+
+update_pec_rates = repository_path_decorator(_pec.update_pec_rates)
