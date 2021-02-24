@@ -16,9 +16,10 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-import cherab.openadas.repository.wavelength as wavelength
-from cherab.openadas.repository.wavelength import *
-from .utility import DEFAULT_REPOSITORY_PATH
+import cherab.openadas.repository.wavelength as _wavelength
+from .utility import repository_path_decorator
 
 
-wavelength.DEFAULT_REPOSITORY_PATH = DEFAULT_REPOSITORY_PATH
+add_wavelength = repository_path_decorator(_wavelength.add_wavelength)
+update_wavelengths = repository_path_decorator(_wavelength.update_wavelengths)
+get_wavelength = repository_path_decorator(_wavelength.get_wavelength)

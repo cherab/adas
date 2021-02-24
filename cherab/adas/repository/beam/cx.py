@@ -16,9 +16,10 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-import cherab.openadas.repository.beam.cx as cx
-from cherab.openadas.repository.beam.cx import *
-from ..utility import DEFAULT_REPOSITORY_PATH
+import cherab.openadas.repository.beam.cx as _beam_cx
+from ..utility import repository_path_decorator
 
 
-cx.DEFAULT_REPOSITORY_PATH = DEFAULT_REPOSITORY_PATH
+add_beam_cx_rate = repository_path_decorator(_beam_cx.add_beam_cx_rate)
+update_beam_cx_rates = repository_path_decorator(_beam_cx.update_beam_cx_rates)
+get_beam_cx_rates = repository_path_decorator(_beam_cx.get_beam_cx_rates)

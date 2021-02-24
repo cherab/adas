@@ -171,6 +171,8 @@ def run_adas603(line, b_field=None, adas_fort=None):
              components_pi/sigma are 2D arrays of relative ratios of
              :math:`\pi`-/:math:`\sigma`-polarised components.
     """
+    B_FIELD_MAX_DEFAULT = 20.
+    B_FIELD_STEP = 0.1
 
     if line in MULTIPLETS:
         executable = 'components603'
@@ -183,8 +185,8 @@ def run_adas603(line, b_field=None, adas_fort=None):
         raise ValueError('{} is not supported.'.format(line))
 
     if not b_field:
-        bmax = B_FIELD_MAX[line] or 20.
-        b_field = np.arange(0, bmax, 0.1)
+        bmax = B_FIELD_MAX[line] or B_FIELD_MAX_DEFAULT
+        b_field = np.arange(0, bmax, B_FIELD_STEP)
     else:
         b_field = np.sort(b_field)
         if b_field[0] < 0:
@@ -196,7 +198,7 @@ def run_adas603(line, b_field=None, adas_fort=None):
         try:
             adas_fort = os.environ['ADASFORT']
         except KeyError:
-            if '64' in platform.architecture()[0].lower():
+            if '64' in platform.architecture()[0]:
                 adas_fort = 'home/adas/bin64'
             else:
                 adas_fort = 'home/adas/bin'
@@ -206,10 +208,8 @@ def run_adas603(line, b_field=None, adas_fort=None):
     if not os.path.isfile(file_path):
         raise IOError('File {} not found.'.format(file_path))
 
-    wavelengths_pi = []
-    wavelengths_sigma = []
-    components_pi = []
-    components_sigma = []
+    pi_components = []
+    sigma_components = []
 
     for b in b_field:
         process = Popen([file_path], stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -221,41 +221,35 @@ def run_adas603(line, b_field=None, adas_fort=None):
         if errors:
             raise IOError('Process {} is terminated with error: {}.'.format(file_path, errors.decode('utf-8')))
 
-        wl_pi, comp_pi, wl_sigma, comp_sigma = _adas603_output_to_components(outs.decode('utf-8'))
-        wavelengths_pi.append(wl_pi)
-        wavelengths_sigma.append(wl_sigma)
-        components_pi.append(comp_pi)
-        components_sigma.append(comp_sigma)
+        pi_comp, sigma_comp = _adas603_output_to_components(outs.decode('utf-8'))
 
-    return b_field, np.array(wavelengths_pi), np.array(components_pi), np.array(wavelengths_sigma), np.array(components_sigma)
+        pi_components.append(pi_comp)
+        sigma_components.append(sigma_comp)
+
+    return b_field, np.array(pi_components).T, np.array(sigma_components).T
 
 
 def _adas603_output_to_components(outs):
     lines = outs.splitlines()
-    wavelengths_pi = []
-    wavelengths_sigma = []
-    components_pi = []
-    components_sigma = []
+    pi_components = []
+    sigma_components = []
     for line in lines:
         if '#' in line:
             columns = line.split('#')
             intensity = float(columns[-1])
             wavelength = 0.1 * float(columns[-2])
             polarisation = int(columns[-3].split('/')[0])
-            if polarisation:
-                wavelengths_sigma.append(wavelength)
-                components_sigma.append(intensity)
-            else:
-                wavelengths_pi.append(wavelength)
-                components_pi.append(intensity)
 
-    wavelengths_pi = np.array(wavelengths_pi)
-    wavelengths_sigma = np.array(wavelengths_sigma)
-    components_pi = np.array(components_pi)
-    components_sigma = np.array(components_sigma)
+            if polarisation:  # +2/-2 for sigma components
+                sigma_components.append([wavelength, intensity])
+            else:  # 0 for pi components
+                pi_components.append([wavelength, intensity])
+
+    pi_components = np.array(pi_components).T
+    sigma_components = np.array(sigma_components).T
 
     # renormalising
-    components_pi /= components_pi.sum()
-    components_sigma /= components_sigma.sum()
+    pi_components[1] /= pi_components[1].sum()
+    sigma_components[1] /= sigma_components[1].sum()
 
-    return wavelengths_pi, components_pi, wavelengths_sigma, components_sigma
+    return pi_components, sigma_components

@@ -17,9 +17,18 @@
 # under the Licence.
 
 
-import cherab.openadas.repository.atomic as atomic
-from cherab.openadas.repository.atomic import *
-from .utility import DEFAULT_REPOSITORY_PATH
+import cherab.openadas.repository.atomic as _atomic
+from .utility import repository_path_decorator
 
 
-atomic.DEFAULT_REPOSITORY_PATH = DEFAULT_REPOSITORY_PATH
+add_ionisation_rate = repository_path_decorator(_atomic.add_ionisation_rate)
+update_ionisation_rates = repository_path_decorator(_atomic.update_ionisation_rates)
+get_ionisation_rate = repository_path_decorator(_atomic.get_ionisation_rate)
+
+add_recombination_rate = repository_path_decorator(_atomic.add_recombination_rate)
+update_recombination_rates = repository_path_decorator(_atomic.update_recombination_rates)
+get_recombination_rate = repository_path_decorator(_atomic.get_recombination_rate)
+
+add_thermal_cx_rate = repository_path_decorator(_atomic.add_thermal_cx_rate)
+update_thermal_cx_rates = repository_path_decorator(_atomic.update_thermal_cx_rates)
+get_thermal_cx_rate = repository_path_decorator(_atomic.get_thermal_cx_rate)

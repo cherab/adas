@@ -73,7 +73,8 @@ be1_species = Species(beryllium, 1, be1_distribution)
 be2_species = Species(beryllium, 2, be2_distribution)
 
 # define magnetic field
-plasma.b_field = Vector3D(0, 0, 6.0)
+b_field = Vector3D(0, 0, 6.0)
+plasma.b_field = b_field
 
 # define species
 plasma.electron_distribution = e_distribution
@@ -107,6 +108,7 @@ for angle in angles:
 plt.figure()
 for i, angle in enumerate(angles):
     plt.plot(multiplet[i].wavelengths, multiplet[i].samples, ls=':', label=r'{}$\degree$'.format(angle))
+plt.text(0.05, 0.9, 'B = {} T'.format(b_field.length), transform=plt.gca().transAxes)
 plt.legend()
 plt.xlabel('Wavelength (nm)')
 plt.ylabel('Radiance (W/m^2/str/nm)')
@@ -131,6 +133,7 @@ for angle in angles:
 plt.figure()
 for i, angle in enumerate(angles):
     plt.plot(multiplet[i].wavelengths, multiplet[i].samples, ls=':', label=r'{}$\degree$'.format(angle))
+plt.text(0.05, 0.9, 'B = {} T'.format(b_field.length), transform=plt.gca().transAxes)
 plt.legend()
 plt.xlabel('Wavelength (nm)')
 plt.ylabel('Radiance (W/m^2/str/nm)')

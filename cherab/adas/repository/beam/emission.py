@@ -16,9 +16,10 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-import cherab.openadas.repository.beam.emission as emission
-from cherab.openadas.repository.beam.emission import *
-from ..utility import DEFAULT_REPOSITORY_PATH
+import cherab.openadas.repository.beam.emission as _beam_emission
+from ..utility import repository_path_decorator
 
 
-emission.DEFAULT_REPOSITORY_PATH = DEFAULT_REPOSITORY_PATH
+add_beam_emission_rate = repository_path_decorator(_beam_emission.add_beam_emission_rate)
+update_beam_emission_rates = repository_path_decorator(_beam_emission.update_beam_emission_rates)
+get_beam_emission_rate = repository_path_decorator(_beam_emission.get_beam_emission_rate)

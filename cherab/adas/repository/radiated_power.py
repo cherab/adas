@@ -18,9 +18,18 @@
 # under the Licence.
 
 
-import cherab.openadas.repository.radiated_power as radiated_power
-from cherab.openadas.repository.radiated_power import *
-from .utility import DEFAULT_REPOSITORY_PATH
+import cherab.openadas.repository.radiated_power as _radiated_power
+from .utility import repository_path_decorator
 
 
-radiated_power.DEFAULT_REPOSITORY_PATH = DEFAULT_REPOSITORY_PATH
+add_line_power_rate = repository_path_decorator(_radiated_power.add_line_power_rate)
+update_line_power_rates = repository_path_decorator(_radiated_power.update_line_power_rates)
+get_line_radiated_power_rate = repository_path_decorator(_radiated_power.get_line_radiated_power_rate)
+
+add_continuum_power_rate = repository_path_decorator(_radiated_power.add_continuum_power_rate)
+update_continuum_power_rates = repository_path_decorator(_radiated_power.update_continuum_power_rates)
+get_continuum_radiated_power_rate = repository_path_decorator(_radiated_power.get_continuum_radiated_power_rate)
+
+add_cx_power_rate = repository_path_decorator(_radiated_power.add_cx_power_rate)
+update_cx_power_rates = repository_path_decorator(_radiated_power.update_cx_power_rates)
+get_cx_radiated_power_rate = repository_path_decorator(_radiated_power.get_cx_radiated_power_rate)

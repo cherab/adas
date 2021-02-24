@@ -17,7 +17,30 @@
 # under the Licence.
 
 import os
+from inspect import signature
+from functools import wraps
 from cherab.openadas.repository.utility import encode_transition, valid_charge
 
 
 DEFAULT_REPOSITORY_PATH = os.path.expanduser('~/.cherab/adas/repository')
+
+
+def repository_path_decorator(f):
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if len(args) == len(signature(f).parameters):  # repository_path is passed in args
+            if not args[-1]:  # repository_path is None
+                kwargs['repository_path'] = DEFAULT_REPOSITORY_PATH
+                return f(*args[:-1], **kwargs)
+
+            return f(*args, **kwargs)  # repository_path is not None
+
+        try:  # repository_path is passed in kwargs
+            kwargs['repository_path'] = kwargs['repository_path'] or DEFAULT_REPOSITORY_PATH
+        except KeyError:  # repository_path is not passed
+            kwargs['repository_path'] = DEFAULT_REPOSITORY_PATH
+
+        return f(*args, **kwargs)
+
+    return wrapper
