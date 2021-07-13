@@ -358,19 +358,25 @@ class ADAS(AtomicData):
         :return:
         """
 
-        b_field, pi_comp, sigma_comp = run_adas603(line, b_field)
+        b_field, pi_comp, sigma_plus_comp, sigma_minus_comp = run_adas603(line, b_field)
 
         pi_components = []
-        sigma_components = []
+        sigma_plus_components = []
+        sigma_minus_components = []
 
         for component in pi_comp:
             wvl = Interpolate1DLinear(b_field, component[0])
             ratio = Interpolate1DLinear(b_field, component[1])
             pi_components.append((wvl, ratio))
 
-        for component in sigma_comp:
+        for component in sigma_plus_comp:
             wvl = Interpolate1DLinear(b_field, component[0])
             ratio = Interpolate1DLinear(b_field, component[1])
-            sigma_components.append((wvl, ratio))
+            sigma_plus_components.append((wvl, ratio))
 
-        return ZeemanStructure(pi_components, sigma_components)
+        for component in sigma_minus_comp:
+            wvl = Interpolate1DLinear(b_field, component[0])
+            ratio = Interpolate1DLinear(b_field, component[1])
+            sigma_minus_components.append((wvl, ratio))
+
+        return ZeemanStructure(pi_components, sigma_plus_components, sigma_minus_components)

@@ -164,12 +164,12 @@ def run_adas603(line, b_field=None, adas_fort=None):
     :param str adas_fort: Path to ADAS FORTRAN executables.
                           Default path is 'home/adas/bin64' for 64-bit systems or
                           'home/adas/bin' for 32-bit systems.
-    :return: A tuple (b_field, wavelengths_pi, components_pi, wavelengths_sigma, components_sigma),
-             where b_field is a sorted array of the specified magnetic field strengths,
-             wavelengths_pi/sigma are 2D arrays of wavelengths of
-             :math:`\pi`-/:math:`\sigma`-polarised components,
-             components_pi/sigma are 2D arrays of relative ratios of
-             :math:`\pi`-/:math:`\sigma`-polarised components.
+    :return: A tuple (b_field, pi_components, sigma_plus_components, sigma_minus_components),
+             where b_field is a sorted array of the specified magnetic field strengths of size Nb,
+             pi/sigma_plus/sigma_minus_components are 3D arrays of shape (Ncomp, 2, Nb)
+             with wavelengths and relative intensities of
+             :math:`\pi`-/:math:`\sigma^{+}`-/:math:`\sigma^{-}`-polarised components
+             for different values of magnetic field strength.
     """
     B_FIELD_MAX_DEFAULT = 20.
     B_FIELD_STEP = 0.1
@@ -209,7 +209,8 @@ def run_adas603(line, b_field=None, adas_fort=None):
         raise IOError('File {} not found.'.format(file_path))
 
     pi_components = []
-    sigma_components = []
+    sigma_plus_components = []
+    sigma_minus_components = []
 
     for b in b_field:
         process = Popen([file_path], stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -221,18 +222,20 @@ def run_adas603(line, b_field=None, adas_fort=None):
         if errors:
             raise IOError('Process {} is terminated with error: {}.'.format(file_path, errors.decode('utf-8')))
 
-        pi_comp, sigma_comp = _adas603_output_to_components(outs.decode('utf-8'))
+        pi_comp, sigma_plus_comp, sigma_minus_comp = _adas603_output_to_components(outs.decode('utf-8'))
 
         pi_components.append(pi_comp)
-        sigma_components.append(sigma_comp)
+        sigma_plus_components.append(sigma_plus_comp)
+        sigma_minus_components.append(sigma_minus_comp)
 
-    return b_field, np.array(pi_components).T, np.array(sigma_components).T
+    return b_field, np.array(pi_components).T, np.array(sigma_plus_components).T, np.array(sigma_minus_components).T
 
 
 def _adas603_output_to_components(outs):
     lines = outs.splitlines()
     pi_components = []
-    sigma_components = []
+    sigma_plus_components = []
+    sigma_minus_components = []
     for line in lines:
         if '#' in line:
             columns = line.split('#')
@@ -240,16 +243,20 @@ def _adas603_output_to_components(outs):
             wavelength = 0.1 * float(columns[-2])
             polarisation = int(columns[-3].split('/')[0])
 
-            if polarisation:  # +2/-2 for sigma components
-                sigma_components.append([wavelength, intensity])
-            else:  # 0 for pi components
+            if polarisation == 0:  # pi components
                 pi_components.append([wavelength, intensity])
+            elif polarisation > 0:  # sigma+ components
+                sigma_plus_components.append([wavelength, intensity])
+            elif polarisation < 0:  # sigma- components
+                sigma_minus_components.append([wavelength, intensity])
 
     pi_components = np.array(pi_components).T
-    sigma_components = np.array(sigma_components).T
+    sigma_plus_components = np.array(sigma_plus_components).T
+    sigma_minus_components = np.array(sigma_minus_components).T
 
     # renormalising
     pi_components[1] /= pi_components[1].sum()
-    sigma_components[1] /= sigma_components[1].sum()
+    sigma_plus_components[1] /= sigma_plus_components[1].sum()
+    sigma_minus_components[1] /= sigma_minus_components[1].sum()
 
-    return pi_components, sigma_components
+    return pi_components, sigma_plus_components, sigma_minus_components

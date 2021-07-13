@@ -112,7 +112,7 @@ plt.text(0.05, 0.9, 'B = {} T'.format(b_field.length), transform=plt.gca().trans
 plt.legend()
 plt.xlabel('Wavelength (nm)')
 plt.ylabel('Radiance (W/m^2/str/nm)')
-plt.title(r'D$\alpha$ spectrum observed at different angles\nbetween ray and magnetic field')
+plt.title(r'D$\alpha$ spectrum observed at different angles' + '\nbetween ray and magnetic field')
 
 # add ZeemanMultiplet model of Be II 527 nm line to the plasma
 zeeman_structure = adas.zeeman_structure(beryllium_II_527)
