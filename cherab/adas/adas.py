@@ -1,6 +1,6 @@
-# Copyright 2016-2018 Euratom
-# Copyright 2016-2018 United Kingdom Atomic Energy Authority
-# Copyright 2016-2018 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
+# Copyright 2016-2021 Euratom
+# Copyright 2016-2021 United Kingdom Atomic Energy Authority
+# Copyright 2016-2021 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
 #
 # Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -16,7 +16,9 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from cherab.core.math.interpolators import Interpolate1DLinear
+import numpy as np
+from raysect.core.math.function.float import Interpolator1DArray
+
 from cherab.core import AtomicData
 from cherab.core.atomic.elements import Isotope
 from cherab.core.atomic import ZeemanStructure
@@ -362,7 +364,8 @@ class ADAS(AtomicData):
         electron_densities, electron_temperatures, fraction, _, _, _, _, _ = run_adas405(elem=ion.symbol.lower())
         name = ion.symbol + '_' + str(ionisation)
 
-        return FractionalAbundance(ion, ionisation, electron_densities, electron_temperatures, fraction[:, :, ionisation], name=name)
+        return FractionalAbundance(ion, ionisation, electron_densities, electron_temperatures, fraction[:, :, ionisation],
+                                   name=name, extrapolate=self._permit_extrapolation)
 
     def zeeman_structure(self, line, b_field=None):
         r"""
@@ -386,19 +389,21 @@ class ADAS(AtomicData):
         sigma_plus_components = []
         sigma_minus_components = []
 
+        extrapolation_type = 'nearest' if self._permit_extrapolation else 'none'
+
         for component in pi_comp:
-            wvl = Interpolate1DLinear(b_field, component[0])
-            ratio = Interpolate1DLinear(b_field, component[1])
+            wvl = Interpolator1DArray(b_field, component[0], 'linear', extrapolation_type, np.inf)
+            ratio = Interpolator1DArray(b_field, component[1], 'linear', extrapolation_type, np.inf)
             pi_components.append((wvl, ratio))
 
         for component in sigma_plus_comp:
-            wvl = Interpolate1DLinear(b_field, component[0])
-            ratio = Interpolate1DLinear(b_field, component[1])
+            wvl = Interpolator1DArray(b_field, component[0], 'linear', extrapolation_type, np.inf)
+            ratio = Interpolator1DArray(b_field, component[1], 'linear', extrapolation_type, np.inf)
             sigma_plus_components.append((wvl, ratio))
 
         for component in sigma_minus_comp:
-            wvl = Interpolate1DLinear(b_field, component[0])
-            ratio = Interpolate1DLinear(b_field, component[1])
+            wvl = Interpolator1DArray(b_field, component[0], 'linear', extrapolation_type, np.inf)
+            ratio = Interpolator1DArray(b_field, component[1], 'linear', extrapolation_type, np.inf)
             sigma_minus_components.append((wvl, ratio))
 
         return ZeemanStructure(pi_components, sigma_plus_components, sigma_minus_components)
