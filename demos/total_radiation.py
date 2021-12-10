@@ -1,3 +1,20 @@
+# Copyright 2016-2021 Euratom
+# Copyright 2016-2021 United Kingdom Atomic Energy Authority
+# Copyright 2016-2021 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
+#
+# Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
+# European Commission - subsequent versions of the EUPL (the "Licence");
+# You may not use this work except in compliance with the Licence.
+# You may obtain a copy of the Licence at:
+#
+# https://joinup.ec.europa.eu/software/page/eupl5
+#
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the Licence is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
+#
+# See the Licence for the specific language governing permissions and limitations
+# under the Licence.
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +29,7 @@ print("Testing total radiation for Neon.")
 atomic_data = ADAS()
 
 electron_density = 1.e19
-electron_temperature = np.logspace(0, 4, 41)
+electron_temperature = np.geomspace(1, 10000, 81)
 
 # Obtaining total radiation using ADAS405 code (equilibrium balance)
 total_rad = atomic_data.total_radiated_power(neon)
