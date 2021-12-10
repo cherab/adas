@@ -6,6 +6,8 @@ import os
 import os.path as path
 import multiprocessing
 
+multiprocessing.set_start_method('fork')
+
 threads = multiprocessing.cpu_count()
 force = False
 profile = False
