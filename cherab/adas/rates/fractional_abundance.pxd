@@ -16,6 +16,14 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from cherab.openadas.rates import *
-from .radiated_power import *
-from .fractional_abundance import *
+from cherab.core.atomic.rates cimport FractionalAbundance as CoreFractionalAbundance
+from cherab.core.math cimport Function2D
+
+
+cdef class FractionalAbundance(CoreFractionalAbundance):
+
+    cdef:
+        readonly dict raw_data
+        readonly tuple density_range, temperature_range
+        readonly Function2D _abundance_func
+

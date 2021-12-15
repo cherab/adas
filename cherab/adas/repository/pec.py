@@ -16,6 +16,17 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from cherab.openadas.rates import *
-from .radiated_power import *
-from .fractional_abundance import *
+import cherab.openadas.repository.pec as _pec
+from .utility import repository_path_decorator
+
+
+add_pec_excitation_rate = repository_path_decorator(_pec.add_pec_excitation_rate)
+get_pec_excitation_rate = repository_path_decorator(_pec.get_pec_excitation_rate)
+
+add_pec_recombination_rate = repository_path_decorator(_pec.add_pec_recombination_rate)
+get_pec_recombination_rate = repository_path_decorator(_pec.get_pec_recombination_rate)
+
+add_pec_thermalcx_rate = repository_path_decorator(_pec.add_pec_thermalcx_rate)
+get_pec_thermalcx_rate = repository_path_decorator(_pec.get_pec_thermalcx_rate)
+
+update_pec_rates = repository_path_decorator(_pec.update_pec_rates)

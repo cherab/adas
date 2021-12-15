@@ -16,6 +16,10 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from cherab.openadas.rates import *
-from .radiated_power import *
-from .fractional_abundance import *
+import cherab.openadas.repository.beam.population as _beam_population
+from ..utility import repository_path_decorator
+
+
+add_beam_population_rate = repository_path_decorator(_beam_population.add_beam_population_rate)
+update_beam_population_rates = repository_path_decorator(_beam_population.update_beam_population_rates)
+get_beam_population_rate = repository_path_decorator(_beam_population.get_beam_population_rate)

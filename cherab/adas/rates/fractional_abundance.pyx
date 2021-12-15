@@ -1,5 +1,6 @@
-
-# Copyright 2014-2017 United Kingdom Atomic Energy Authority
+# Copyright 2016-2021 Euratom
+# Copyright 2016-2021 United Kingdom Atomic Energy Authority
+# Copyright 2016-2021 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
 #
 # Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -16,38 +17,31 @@
 # under the Licence.
 
 import numpy as np
-from numpy cimport ndarray
-from cherab.core.math.interpolators.interpolators2d cimport Interpolate2DCubic
-from cherab.core.atomic.rates cimport FractionalAbundance as CoreFractionalAbundance
+from libc.math cimport INFINITY
+
+from raysect.core.math.function.float cimport Interpolator2DArray
 
 
 cdef class FractionalAbundance(CoreFractionalAbundance):
-
-    cdef:
-        readonly bint extrapolate
-        readonly tuple density_range, temperature_range
-        readonly ndarray _electron_density, _electron_temperature, _fractional_abundance
-        readonly Interpolate2DCubic _abundance_func
 
     def __init__(self, element, ionisation, electron_density, electron_temperature, fractional_abundance, name='', extrapolate=False):
 
         super().__init__(element, ionisation, name)
 
-        self.name = name
-        self.element = element
-        self.ionisation = ionisation
+        self.raw_data = {'ne': np.array(electron_density, np.float64),
+                         'te': np.array(electron_temperature, np.float64),
+                         'fractional_abundance': np.array(fractional_abundance, np.float64)}
 
-        self._electron_density = np.array(electron_density)
-        self._electron_temperature = np.array(electron_temperature)
-        self._fractional_abundance = np.array(fractional_abundance)
+        # store limits of data
+        self.density_range = self.raw_data['ne'].min(), self.raw_data['ne'].max()
+        self.temperature_range = self.raw_data['te'].min(), self.raw_data['te'].max()
 
-        self.density_range = (self._electron_density.min(), self._electron_density.max())
-        self.temperature_range = (self._electron_temperature.min(), self._electron_temperature.max())
-
-        self.extrapolate = extrapolate
-        self._abundance_func = Interpolate2DCubic(self._electron_density, self._electron_temperature,
-                                                  self._fractional_abundance,
-                                                  extrapolate=extrapolate, extrapolation_type="quadratic")
+        # interpolate fractional abundance
+        extrapolation_type = 'linear' if extrapolate else 'none'
+        self._abundance_func = Interpolator2DArray(self.raw_data['ne'], self.raw_data['te'], self.raw_data['fractional_abundance'],
+                                                   'cubic', extrapolation_type, INFINITY, INFINITY)
 
     cdef double evaluate(self, double electron_density, double electron_temperature) except? -1e999:
-        return self._abundance_func.evaluate(electron_density, electron_temperature)
+
+        # prevent negative values (possible if extrapolation enabled)
+        return max(0, self._abundance_func.evaluate(electron_density, electron_temperature))

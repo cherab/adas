@@ -16,6 +16,8 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from cherab.openadas.rates import *
-from .radiated_power import *
-from .fractional_abundance import *
+from cherab.openadas.parse.adf11 import parse_adf11
+from cherab.openadas.parse.adf12 import parse_adf12
+from cherab.openadas.parse.adf15 import parse_adf15
+from cherab.openadas.parse.adf21 import parse_adf21
+from cherab.openadas.parse.adf22 import parse_adf22bmp, parse_adf22bme

@@ -16,6 +16,10 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from cherab.openadas.rates import *
-from .radiated_power import *
-from .fractional_abundance import *
+import cherab.openadas.repository.wavelength as _wavelength
+from .utility import repository_path_decorator
+
+
+add_wavelength = repository_path_decorator(_wavelength.add_wavelength)
+update_wavelengths = repository_path_decorator(_wavelength.update_wavelengths)
+get_wavelength = repository_path_decorator(_wavelength.get_wavelength)

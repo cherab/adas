@@ -16,6 +16,10 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from cherab.openadas.rates import *
-from .radiated_power import *
-from .fractional_abundance import *
+import cherab.openadas.repository.beam.cx as _beam_cx
+from ..utility import repository_path_decorator
+
+
+add_beam_cx_rate = repository_path_decorator(_beam_cx.add_beam_cx_rate)
+update_beam_cx_rates = repository_path_decorator(_beam_cx.update_beam_cx_rates)
+get_beam_cx_rates = repository_path_decorator(_beam_cx.get_beam_cx_rates)
