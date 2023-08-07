@@ -28,12 +28,21 @@ from raysect.optical.material.emitter.inhomogeneous import NumericalIntegrator
 from cherab.core import Species, Maxwellian, Plasma, Line
 from cherab.core.atomic.elements import deuterium, beryllium
 from cherab.core.model import ExcitationLine, RecombinationLine, ZeemanMultiplet
-from cherab.adas import ADAS
+from cherab.atomic import AtomicData
 from cherab.tools.plasmas import GaussianVolume
+from cherab.adas import install_zeeman_structures
 
 # Uncomment this if local ADAS respository is not populated
 # from cherab.adas.repository import populate
 # populate()
+
+# setup D-alpha line
+deuterium_I_656 = Line(deuterium, 0, (3, 2))  # n = 3->2: 656.1nm
+
+# setup Be II 527 nm line
+beryllium_II_527 = Line(beryllium, 1, ("4s1 2s0.5", "3p1 2p2.5"))  # 527 nm
+
+install_zeeman_structures(lines=[deuterium_I_656, beryllium_II_527], adas_fort=None, repository_path=None)
 
 # tunables
 ion_density = 1e19
@@ -43,7 +52,7 @@ sigma = 0.25
 world = World()
 
 # create atomic data source
-adas = ADAS(permit_extrapolation=True)
+adas = AtomicData(permit_extrapolation=True)
 
 # PLASMA ----------------------------------------------------------------------
 plasma = Plasma(parent=world)
@@ -79,12 +88,6 @@ plasma.b_field = b_field
 # define species
 plasma.electron_distribution = e_distribution
 plasma.composition = [d0_species, d1_species, be1_species, be2_species]
-
-# setup D-alpha line
-deuterium_I_656 = Line(deuterium, 0, (3, 2))  # n = 3->2: 656.1nm
-
-# setup Be II 527 nm line
-beryllium_II_527 = Line(beryllium, 1, ("4s1 2s0.5", "3p1 2p2.5"))  # 527 nm
 
 # angles between the ray and the magnetic field direction
 angles = (0., 45., 90.)

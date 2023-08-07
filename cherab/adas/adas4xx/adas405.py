@@ -1,6 +1,6 @@
-# Copyright 2016-2021 Euratom
-# Copyright 2016-2021 United Kingdom Atomic Energy Authority
-# Copyright 2016-2021 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
+# Copyright 2016-2023 Euratom
+# Copyright 2016-2023 United Kingdom Atomic Energy Authority
+# Copyright 2016-2023 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
 #
 # Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -29,6 +29,26 @@ _electron_temperatures = [10**x for x in np.linspace(-0.7, 4.2, num=100)]
 
 
 def run_adas405(uid='adas', year=96, elem='ne'):
+    """
+    Runs ADAS405 routine and gets radiated power for a given element.
+
+    :param uid: Username of adf11 location. Defaults to 'adas' for central ADAS data.
+    :param year: Year index of the adf11 data. Defaults to 96.
+    :param elem: Element symbol. Defaults to 'ne'.
+
+    :returns:
+
+    |    ne: electron density array of size N,
+    |    te: electron temperature array of size M,
+    |    fractional_abundance: (N, M, K) array with fractional abundances,
+    |    total_power: (N, M) array with total radiated power,
+    |    line_power: (N, M) array with line power driven by excitation of dominant ions,
+    |    continuum_power: (N, M) array with continuum and line power driven by recombination
+    |        and Bremsstrahlung of dominant ions,
+    |    cx_power: (N, M) array with line power due to charge transfer from thermal neutral
+    |        hydrogen to dominant ions,
+    |    stage_resolved_line_power: (N, M, K) array with line power resolved over ionisation stage.
+    """
 
     unique_cache_id = (uid, year, elem)
 

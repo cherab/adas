@@ -19,12 +19,15 @@
 import matplotlib.pyplot as plt
 
 from cherab.core.atomic import neon
-from cherab.adas import ADAS
+from cherab.atomic import AtomicData
+from cherab.adas import install_fractional_abundances
 
 
 print("testing fraction abundance for Neon")
 
-atomic_data = ADAS()
+install_fractional_abundances(neon)
+
+atomic_data = AtomicData()
 
 plt.figure()
 ne0_frac = atomic_data.fractional_abundance(neon, 0)

@@ -1,6 +1,6 @@
-# Copyright 2016-2021 Euratom
-# Copyright 2016-2021 United Kingdom Atomic Energy Authority
-# Copyright 2016-2021 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
+# Copyright 2016-2023 Euratom
+# Copyright 2016-2023 United Kingdom Atomic Energy Authority
+# Copyright 2016-2023 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
 #
 # Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -19,12 +19,19 @@
 
 import os
 
-from cherab.adas import repository
+from cherab.atomic import repository
 from cherab.adas.parse import *
+from cherab.adas.adas6xx.adas603 import SUPPORTED_LINES as ADAS603_SUPPORTED_LINES
+from cherab.adas.adas6xx import run_adas603
+from cherab.adas.adas4xx import run_adas405
 from cherab.core.utility import RecursiveDict, PerCm3ToPerM3, Cm3ToM3
 
 
 def install_files(configuration, repository_path=None, adas_home=None):
+    """
+    Wrapper function that installs rates of atomic processes defined
+    in ADAS files to the repository.
+    """
 
     for adf in configuration:
         if adf.lower() == 'adf11scd':
@@ -255,13 +262,17 @@ def install_adf15(element, ionisation, file_path, repository_path=None, adas_hom
 
 
 def install_adf21(beam_species, target_ion, target_charge, file_path, repository_path=None, adas_home=None):
-    # """
-    # Adds the rate defined in an ADF21 file to the repository.
-    #
-    # :param file_path: Path relative to ADAS home.
-    # :param repository_path: Path to the repository in which to install the rates (optional).
-    # :param adas_home: Path to ADAS home directory (optional).
-    # """
+    """
+    Adds the beam stopping rate defined in an ADF21 file to the repository.
+
+    :param beam_species: Beam neutral atom (Element/Isotope).
+    :param target_ion: Target species (Element/Isotope).
+    :param target_charge: Charge of the target species.
+    :param file_path: Path relative to ADAS root.
+    :param download: Attempt to download file if not present (Default=True).
+    :param repository_path: Path to the repository in which to install the rates (optional).
+    :param adas_home: Path to ADAS home directory (optional).
+    """
 
     print('Installing {}...'.format(file_path))
     path = _locate_adas_file(file_path, adas_home)
@@ -274,14 +285,18 @@ def install_adf21(beam_species, target_ion, target_charge, file_path, repository
 
 
 def install_adf22bmp(beam_species, beam_metastable, target_ion, target_charge, file_path, repository_path=None, adas_home=None):
-    pass
-    # """
-    # Adds the rate defined in an ADF21 file to the repository.
-    #
-    # :param file_path: Path relative to ADAS home.
-    # :param repository_path: Path to the repository in which to install the rates (optional).
-    # :param adas_home: Path to ADAS home directory (optional).
-    # """
+    """
+    Adds the beam population rate defined in an ADF22 BMP file to the repository.
+
+    :param beam_species: Beam neutral atom (Element/Isotope).
+    :param beam_metastable: Metastable level of beam neutral atom.
+    :param target_ion: Target species (Element/Isotope).
+    :param target_charge: Charge of the target species.
+    :param file_path: Path relative to ADAS root.
+    :param download: Attempt to download file if not present (Default=True).
+    :param repository_path: Path to the repository in which to install the rates (optional).
+    :param adas_home: Path to ADAS home directory (optional).
+    """
 
     print('Installing {}...'.format(file_path))
     path = _locate_adas_file(file_path, adas_home)
@@ -294,14 +309,18 @@ def install_adf22bmp(beam_species, beam_metastable, target_ion, target_charge, f
 
 
 def install_adf22bme(beam_species, target_ion, target_charge, transition, file_path, repository_path=None, adas_home=None):
-    pass
-    # """
-    # Adds the rate defined in an ADF21 file to the repository.
-    #
-    # :param file_path: Path relative to ADAS home.
-    # :param repository_path: Path to the repository in which to install the rates (optional).
-    # :param adas_home: Path to ADAS home directory (optional).
-    # """
+    """
+    Adds the beam emission rate defined in an ADF22 BME file to the repository.
+
+    :param beam_species: Beam neutral atom (Element/Isotope).
+    :param target_ion: Target species (Element/Isotope).
+    :param target_charge: Charge of the target species.
+    :param transition: Tuple containing (initial level, final level).
+    :param file_path: Path relative to ADAS root.
+    :param download: Attempt to download file if not present (Default=True).
+    :param repository_path: Path to the repository in which to install the rates (optional).
+    :param adas_home: Path to ADAS home directory (optional).
+    """
 
     print('Installing {}...'.format(file_path))
     path = _locate_adas_file(file_path, adas_home)
@@ -311,6 +330,67 @@ def install_adf22bme(beam_species, target_ion, target_charge, transition, file_p
     # # decode file and write out rates
     rate = parse_adf22bme(beam_species, target_ion, target_charge, transition, path)
     repository.update_beam_emission_rates(rate, repository_path)
+
+
+def install_zeeman_structures(lines=None, adas_fort=None, repository_path=None):
+    """
+    Runs ADAS603 and adds Zeeman multiplet structures for given spectral lines to the repository.
+
+    :param lines: Spectral lines for which the Zeeman structure is calculated.
+        Run cherab.adas.adas6xx.print_adas603_supported_lines() to see the complete list
+        of supported lines.
+    :param adas_fort: Path to ADAS FORTRAN executables.
+        Default path is 'home/adas/bin64' for 64-bit systems or 'home/adas/bin' for 32-bit systems.
+    :param repository_path: Path to the repository in which to install the rates (optional).
+    """
+
+    if lines is None:
+        lines = ADAS603_SUPPORTED_LINES
+    else:
+        unsupported_lines = set(lines).difference(ADAS603_SUPPORTED_LINES)
+        if len(unsupported_lines):
+            unsupported_lines_str = '\n'.join([str(line) for line in unsupported_lines])
+            raise ValueError("The followoing spectral lines are not supported:\n{}".format(unsupported_lines_str))
+
+    zeeman_structures = RecursiveDict()
+    for line in lines:
+        data = run_adas603(line, adas_fort=adas_fort)
+        zeeman_structures[line.element][line.charge][line.transition] = data
+
+    repository.update_zeeman_structures(zeeman_structures, repository_path)
+
+
+def install_total_power_rate(element, uid='adas', year=96, repository_path=None):
+    """
+    Runs ADAS405 and adds total radiated power rate for given species to the repository.
+
+    :param element: Plasma species element.
+    :param uid: Username of adf11 location. Defaults to 'adas' for central ADAS data.
+    :param year: Year index of the adf11 data. Defaults to 96.
+    """
+
+    ne, te, _, total_power_rate, _, _, _, _ = run_adas405(uid=uid, year=year, elem=element.symbol.lower())
+    data = {'ne': ne, 'te': te, 'rate': rate}
+
+    repository.add_total_power_rate(element, data, repository_path=repository_path)
+
+
+def install_fractional_abundances(element, uid='adas', year=96, repository_path=None):
+    """
+    Runs ADAS405 and adds fractional abundances for given species to the repository.
+
+    :param element: Plasma species element.
+    :param uid: Username of adf11 location. Defaults to 'adas' for central ADAS data.
+    :param year: Year index of the adf11 data.
+    """
+
+    ne, te, fractionl_abundances, _, _, _, _, _ = run_adas405(uid=uid, year=year, elem=element.symbol.lower())
+    data = {element: {}}
+
+    for i in range(fractionl_abundances.shape[-1]):
+        data[element][i] = {'ne': ne, 'te': te, 'fractionl_abundance': fractionl_abundances[:, :, i]}
+
+    repository.update_fractional_abundances(data, repository_path=repository_path)
 
 
 def _locate_adas_file(file_path, adas_home=None):

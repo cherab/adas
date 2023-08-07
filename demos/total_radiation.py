@@ -21,12 +21,15 @@ import matplotlib.pyplot as plt
 
 from cherab.core.atomic import neon
 from cherab.core.math import sample2d_grid
-from cherab.adas import ADAS
+from cherab.atomic import AtomicData
+from cherab.adas import install_total_power_rate
 
 
 print("Testing total radiation for Neon.")
 
-atomic_data = ADAS()
+install_total_power_rate(neon)
+
+atomic_data = AtomicData()
 
 electron_density = 1.e19
 electron_temperature = np.geomspace(1, 10000, 81)
