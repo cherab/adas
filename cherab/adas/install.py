@@ -388,7 +388,7 @@ def install_fractional_abundances(element, uid='adas', year=96, repository_path=
     data = {element: {}}
 
     for i in range(fractionl_abundances.shape[-1]):
-        data[element][i] = {'ne': ne, 'te': te, 'fractionl_abundance': fractionl_abundances[:, :, i]}
+        data[element][i] = {'ne': ne, 'te': te, 'fractional_abundance': fractionl_abundances[:, :, i]}
 
     repository.update_fractional_abundances(data, repository_path=repository_path)
 

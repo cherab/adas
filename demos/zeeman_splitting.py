@@ -30,7 +30,7 @@ from cherab.core.atomic.elements import deuterium, beryllium
 from cherab.core.model import ExcitationLine, RecombinationLine, ZeemanMultiplet
 from cherab.atomic import AtomicData
 from cherab.tools.plasmas import GaussianVolume
-from cherab.adas import install_zeeman_structures
+from cherab.adas.install import install_zeeman_structures
 
 # Uncomment this if local ADAS respository is not populated
 # from cherab.adas.repository import populate

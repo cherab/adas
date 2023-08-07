@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 from cherab.core.atomic import neon
 from cherab.atomic import AtomicData
-from cherab.adas import install_fractional_abundances
+from cherab.adas.install import install_fractional_abundances
 
 
 print("testing fraction abundance for Neon")

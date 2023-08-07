@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 from cherab.core.atomic import neon
 from cherab.core.math import sample2d_grid
 from cherab.atomic import AtomicData
-from cherab.adas import install_total_power_rate
+from cherab.adas.install import install_total_power_rate
 
 
 print("Testing total radiation for Neon.")
