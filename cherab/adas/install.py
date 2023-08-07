@@ -370,7 +370,7 @@ def install_total_power_rate(element, uid='adas', year=96, repository_path=None)
     """
 
     ne, te, _, total_power_rate, _, _, _, _ = run_adas405(uid=uid, year=year, elem=element.symbol.lower())
-    data = {'ne': ne, 'te': te, 'rate': rate}
+    data = {'ne': ne, 'te': te, 'rate': total_power_rate}
 
     repository.add_total_power_rate(element, data, repository_path=repository_path)
 
