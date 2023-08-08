@@ -1,6 +1,6 @@
-# Copyright 2016-2021 Euratom
-# Copyright 2016-2021 United Kingdom Atomic Energy Authority
-# Copyright 2016-2021 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
+# Copyright 2016-2023 Euratom
+# Copyright 2016-2023 United Kingdom Atomic Energy Authority
+# Copyright 2016-2023 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
 #
 # Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -42,7 +42,8 @@ deuterium_I_656 = Line(deuterium, 0, (3, 2))  # n = 3->2: 656.1nm
 # setup Be II 527 nm line
 beryllium_II_527 = Line(beryllium, 1, ("4s1 2s0.5", "3p1 2p2.5"))  # 527 nm
 
-install_zeeman_structures(lines=[deuterium_I_656, beryllium_II_527], adas_fort=None, repository_path=None)
+# install Zeeman multiplet structure for D-alpha and Be II 527 nm from ADAS to the atomic data repository
+install_zeeman_structures(lines=[deuterium_I_656, beryllium_II_527])
 
 # tunables
 ion_density = 1e19
@@ -52,11 +53,11 @@ sigma = 0.25
 world = World()
 
 # create atomic data source
-adas = AtomicData(permit_extrapolation=True)
+atomic_data = AtomicData(permit_extrapolation=True)
 
 # PLASMA ----------------------------------------------------------------------
 plasma = Plasma(parent=world)
-plasma.atomic_data = adas
+plasma.atomic_data = atomic_data
 plasma.geometry = Sphere(sigma * 5.0)
 plasma.geometry_transform = None
 plasma.integrator = NumericalIntegrator(step=sigma / 5.0)
@@ -93,7 +94,7 @@ plasma.composition = [d0_species, d1_species, be1_species, be2_species]
 angles = (0., 45., 90.)
 
 # add ZeemanMultiplet model of D-alpha line to the plasma
-zeeman_structure = adas.zeeman_structure(deuterium_I_656)
+zeeman_structure = atomic_data.zeeman_structure(deuterium_I_656.element, deuterium_I_656.charge, deuterium_I_656.transition)
 
 plasma.models = [
     ExcitationLine(deuterium_I_656, lineshape=ZeemanMultiplet, lineshape_args=[zeeman_structure]),
@@ -118,7 +119,7 @@ plt.ylabel('Radiance (W/m^2/str/nm)')
 plt.title(r'D$\alpha$ spectrum observed at different angles' + '\nbetween ray and magnetic field')
 
 # add ZeemanMultiplet model of Be II 527 nm line to the plasma
-zeeman_structure = adas.zeeman_structure(beryllium_II_527)
+zeeman_structure = atomic_data.zeeman_structure(beryllium_II_527.element, beryllium_II_527.charge, beryllium_II_527.transition)
 
 plasma.models = [
     ExcitationLine(beryllium_II_527, lineshape=ZeemanMultiplet, lineshape_args=[zeeman_structure]),
