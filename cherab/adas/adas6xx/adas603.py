@@ -1,6 +1,6 @@
-# Copyright 2016-2021 Euratom
-# Copyright 2016-2021 United Kingdom Atomic Energy Authority
-# Copyright 2016-2021 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
+# Copyright 2016-2023 Euratom
+# Copyright 2016-2023 United Kingdom Atomic Energy Authority
+# Copyright 2016-2023 Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas
 #
 # Licensed under the EUPL, Version 1.1 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -103,6 +103,9 @@ HDLIKE += [Line(neon, 9, (j, 8)) for j in range(9, 13)]
 HDLIKE += [Line(neon, 9, (j, 9)) for j in range(10, 18)]
 HDLIKE += [Line(neon, 9, (j, i)) for i in range(10, 13) for j in range(i + 1, 21)]
 HDLIKE += [Line(neon, 9, (j, 13)) for j in range(15, 21)]
+
+
+SUPPORTED_LINES = MULTIPLETS + HDLIKE
 
 
 B_FIELD_MAX = {line: None for line in MULTIPLETS + HDLIKE}
@@ -208,9 +211,8 @@ def run_adas603(line, b_field=None, adas_fort=None):
     if not os.path.isfile(file_path):
         raise IOError('File {} not found.'.format(file_path))
 
-    pi_components = []
-    sigma_plus_components = []
-    sigma_minus_components = []
+    wavelength_list = []
+    ratio_list = []
 
     for b in b_field:
         process = Popen([file_path], stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -222,41 +224,49 @@ def run_adas603(line, b_field=None, adas_fort=None):
         if errors:
             raise IOError('Process {} is terminated with error: {}.'.format(file_path, errors.decode('utf-8')))
 
-        pi_comp, sigma_plus_comp, sigma_minus_comp = _adas603_output_to_components(outs.decode('utf-8'))
+        polarisation, wavelength, ratio = _adas603_output_to_components(outs.decode('utf-8'))
 
-        pi_components.append(pi_comp)
-        sigma_plus_components.append(sigma_plus_comp)
-        sigma_minus_components.append(sigma_minus_comp)
+        wavelength_list.append(wavelength)
+        ratio_list.append(ratio)
 
-    return b_field, np.array(pi_components).T, np.array(sigma_plus_components).T, np.array(sigma_minus_components).T
+    data = {
+        'b': b_field,
+        'polarisation': polarisation,
+        'wavelength': np.array(wavelength_list).T,
+        'ratio': np.array(ratio_list).T,
+        'reference': 'ADAS {}'.format(executable)
+    }
+
+    return data
 
 
 def _adas603_output_to_components(outs):
     lines = outs.splitlines()
-    pi_components = []
-    sigma_plus_components = []
-    sigma_minus_components = []
+    ratio = []
+    wavelength = []
+    polarisation = []
     for line in lines:
         if '#' in line:
             columns = line.split('#')
             intensity = float(columns[-1])
-            wavelength = 0.1 * float(columns[-2])
-            polarisation = int(columns[-3].split('/')[0])
+            wvl = 0.1 * float(columns[-2])
+            pol = int(columns[-3].split('/')[0])
 
-            if polarisation == 0:  # pi components
-                pi_components.append([wavelength, intensity])
-            elif polarisation > 0:  # sigma+ components
-                sigma_plus_components.append([wavelength, intensity])
-            elif polarisation < 0:  # sigma- components
-                sigma_minus_components.append([wavelength, intensity])
+            polarisation.append(np.sign(pol))
+            wavelength.append(wvl)
+            ratio.append(intensity)
 
-    pi_components = np.array(pi_components).T
-    sigma_plus_components = np.array(sigma_plus_components).T
-    sigma_minus_components = np.array(sigma_minus_components).T
+    polarisation = np.array(polarisation, dtype=np.int32)
+    wavelength = np.array(wavelength)
+    ratio = np.array(ratio)
 
     # renormalising
-    pi_components[1] /= pi_components[1].sum()
-    sigma_plus_components[1] /= sigma_plus_components[1].sum()
-    sigma_minus_components[1] /= sigma_minus_components[1].sum()
+    index_pi, = np.where(polarisation == 0)
+    index_sigma_plus, = np.where(polarisation == 1)
+    index_sigma_minus, = np.where(polarisation == -1)
 
-    return pi_components, sigma_plus_components, sigma_minus_components
+    ratio[index_pi] /= ratio[index_pi].sum()
+    ratio[index_sigma_plus] /= ratio[index_sigma_plus].sum()
+    ratio[index_sigma_minus] /= ratio[index_sigma_minus].sum()
+
+    return polarisation, wavelength, ratio
